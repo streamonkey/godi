@@ -3,7 +3,7 @@
 Small, type safe dependency injection library for go >= 1.19
 
 
-[![test status](https://github.com/streamonkey/godi/actions/workflows/tests/badge.svg?branch=main "test status")](https://github.com/stramonkey/godi/actions)
+[![test status](https://github.com/streamonkey/godi/actions/workflows/tests.yml/badge.svg?branch=main "test status")](https://github.com/streamonkey/godi/actions)
 [![Apache 2.0 license](https://img.shields.io/badge/license-apache2-brightgreen.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## service definition
