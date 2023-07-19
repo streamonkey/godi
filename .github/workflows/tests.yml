@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.19' ]
+        go: [ '1.19', '1.20' ]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.19' ]
+        go: [ '1.19', '1.20' ]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
