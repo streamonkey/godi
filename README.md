@@ -65,8 +65,8 @@ type (
 
 
 const (
-    ServiceA godi.ServiceID[*ServiceA] = "service.A"
-    ServiceB godi.ServiceID[*ServiceB] = "service.B"
+    ServiceAID godi.ServiceID[*ServiceA] = "service.A"
+    ServiceBID godi.ServiceID[*ServiceB] = "service.B"
 )
 
 
@@ -75,7 +75,7 @@ func createServiceA(ctx context.Context, c *godi.Container[*Config]) (*ServiceA,
 }
 
 func createServiceB(ctx context.Context, c *godi.Container[*Config]) (*ServiceB, error) {
-    serviceA, err := godi.Get(ctx, c, ServiceA)
+    serviceA, err := godi.Get(ctx, c, ServiceAID)
     if err != nil {
         return nil, err
     }
@@ -86,12 +86,45 @@ func main() {
     conf := &Config{}
 
     containerBuilder := godi.New(conf)
-    godi.Register(containerBuilder, ServiceA, createServiceA)
-    godi.Register(containerBuilder, ServiceB, createServiceB)
+    godi.Register(containerBuilder, ServiceAID, createServiceA)
+    godi.Register(containerBuilder, ServiceBID, createServiceB)
     
     container, err := containerBuilder.Build()
     if err != nil {
         log.Fatal(err)
     }
+}
+```
+
+## wraping service resolution errors
+
+For traceability reasons it may be useful to wrap service resolution errors in a deticated error type
+
+
+
+```go 
+package main
+
+import (
+    "github.com/streamonkey/godi/resolve"
+)
+
+type (
+    Service struct {}
+)
+
+const (
+    MyServiceID godi.ServiceID[*Service] = "my.service"
+)
+
+func newService() (*Service, error) {...}
+
+func createMyService(ctx context.Context, c *godi.Container[*Config]) (*Service, error) {
+    s, err  := newService()
+    if err != nil {
+        return nil, resolve.Error(MyServiceID, err)
+    }
+    
+    return s, nil
 }
 ```
