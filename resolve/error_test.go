@@ -1,3 +1,6 @@
+//go:build go1.20
+// +build go1.20
+
 package resolve
 
 import (
@@ -22,7 +25,7 @@ func TestResolveErrorWorksWithoutPreciedingError(t *testing.T) {
 func TestResolveErrorWrapsErrorArgs(t *testing.T) {
 	var service di.ServiceID[struct{}] = "swx"
 	err := Error(service, errors.New("B"), errors.New("A"))
-	assert.Equal(t, err.Error(), "error creating services [swx]:\nB\nA")
+	assert.Equal(t, "error creating services [swx]:\nB\nA", err.Error())
 }
 
 func TestResolveErrorWrapsErrorArgs2(t *testing.T) {

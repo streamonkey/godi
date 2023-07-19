@@ -1,3 +1,6 @@
+//go:build go1.20
+// +build go1.20
+
 package resolve
 
 import (
@@ -5,7 +8,7 @@ import (
 	"fmt"
 
 	di "github.com/streamonkey/godi"
-	"github.com/streamonkey/godi/internal/xerrors"
+	"github.com/streamonkey/godi/internal/xerror"
 )
 
 type (
@@ -33,7 +36,7 @@ func Error[T any](srv di.ServiceID[T], errors ...error) error {
 		return r
 	}
 
-	r.errs = xerrors.Join(errors...)
+	r.errs = xerror.Join(errors...)
 	return r
 }
 
