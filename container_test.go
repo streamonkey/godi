@@ -23,6 +23,10 @@ type (
 	B struct {
 		BName string
 	}
+	CD struct {
+		*A
+		*B
+	}
 )
 
 func TestContainerRegister(t *testing.T) {
@@ -61,11 +65,33 @@ func TestConcurrentResolve(t *testing.T) {
 	t.Cleanup(cancel)
 	cb := New(&Config{A: "a", B: "b"})
 
-	sidA := ServiceID[*A]("service.a")
 	var err error
+
+	const (
+		sidA ServiceID[*A]  = "service.a"
+		sidB ServiceID[*B]  = "service.b"
+		sidC ServiceID[*CD] = "service.c"
+	)
+
 	err = Register(cb, sidA, func(ctx context.Context, cc *Container[*Config]) (*A, error) {
 		return &A{AName: cc.Config().A}, nil
 	})
+	err = Register(cb, sidB, func(ctx context.Context, cc *Container[*Config]) (*B, error) {
+		return &B{BName: cc.Config().B}, nil
+	})
+
+	err = Register(cb, sidC, func(ctx context.Context, cc *Container[*Config]) (*CD, error) {
+		a, err := Get(ctx, cc, sidA)
+		if err != nil {
+			return nil, err
+		}
+		b, err := Get(ctx, cc, sidB)
+		if err != nil {
+			return nil, err
+		}
+		return &CD{A: a, B: b}, nil
+	})
+
 	assert.NoError(t, err)
 
 	assert.NoError(t, err)
@@ -75,14 +101,14 @@ func TestConcurrentResolve(t *testing.T) {
 
 	wg := &sync.WaitGroup{}
 
-	resultc := make(chan *A, 10)
-	errc := make(chan error, 10)
+	resultc := make(chan *CD, 100)
+	errc := make(chan error, 100)
 
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			res, err := Get(ctx, c, sidA)
+			res, err := Get(ctx, c, sidC)
 			if err != nil {
 				errc <- err
 				return
@@ -98,7 +124,7 @@ func TestConcurrentResolve(t *testing.T) {
 		close(errc)
 	}()
 
-	res, err := Get(ctx, c, sidA)
+	res, err := Get(ctx, c, sidC)
 	assert.NoError(t, err)
 
 	for a := range resultc {
